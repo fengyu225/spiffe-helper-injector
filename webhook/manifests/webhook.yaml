@@ -1,0 +1,31 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: spiffe-helper-webhook
+webhooks:
+  - name: webhook.cacerts.csi.cert-manager.io
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 5
+    failurePolicy: Ignore
+    clientConfig:
+      service:
+        name: spiffe-helper-webhook
+        namespace: spiffe-helper-webhook
+        path: "/mutate"
+        port: 8443
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUIwakNDQVZpZ0F3SUJBZ0lVQlAzcEQ0RHF4MDB6TmpiclJsZENYL0F0eDBrd0NnWUlLb1pJemowRUF3TXcKR0RFV01CUUdBMVVFQXhNTlUxQkpVa1VnVW05dmRDQkRRVEFlRncweU5UQXpNall5TXpBeE5UTmFGdzB6TlRBegpNalF5TXpBeU1qTmFNQmd4RmpBVUJnTlZCQU1URFZOUVNWSkZJRkp2YjNRZ1EwRXdkakFRQmdjcWhrak9QUUlCCkJnVXJnUVFBSWdOaUFBUit4TnRvYjB6THNVRUZhSkJwNHNuKzJUS1JYTmpVK083N0dyWHk3eFVwTlNYejhkcnkKcVcxZ1N0MzM1VlVUOFlaWkM2TzhoQUJMOE83VGNRcFdFbzNlcjdjcE54aWRpNTRYenNWUnBVVWN2RGZSeVl6bApCV0t3dEY2RlFtM29DYmFqWXpCaE1BNEdBMVVkRHdFQi93UUVBd0lCQmpBUEJnTlZIUk1CQWY4RUJUQURBUUgvCk1CMEdBMVVkRGdRV0JCVGNrZmFhRHJxSHpMZnlZbHp0UmZGdmp2NTVPVEFmQmdOVkhTTUVHREFXZ0JUY2tmYWEKRHJxSHpMZnlZbHp0UmZGdmp2NTVPVEFLQmdncWhrak9QUVFEQXdOb0FEQmxBakE4RXZXU0UxQUF1MmYwVmdRNgpQTzVyT3p2L1gzVGNnK3Nyb1JlWWJWSTUwY3liRDY3cXFFL014SkNCQnREdWRiUUNNUUNWUTBGUmFmakZVTnJRCmd3N016eG5VdUVsdDhibGFSbFNvc05PRENnclZIMjhrZUFOUW9BQ0RiUzNJL1k0YnBqMD0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    rules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods"]
+        scope: "Namespaced"
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: ["kube-system", "spiffe-helper-webhook"]
+    objectSelector:
+      matchLabels:
+        spiffe.io/spire-managed-identity: "true"

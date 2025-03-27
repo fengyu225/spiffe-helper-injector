@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spire-oidc-provider
+  namespace: oidc-provider
+  labels:
+    app: spire-oidc-provider
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spire-oidc-provider
+  template:
+    metadata:
+      namespace: oidc-provider
+      labels:
+        app: spire-oidc-provider
+        spiffe.io/spire-managed-identity: "true"
+    spec:
+      serviceAccountName: oidc-provider
+      containers:
+        - name: oidc-provider
+          image: ghcr.io/spiffe/oidc-discovery-provider:1.11.0
+          args:
+            - -config
+            - /run/spire/oidc/config/oidc-discovery-provider.conf
+          ports:
+            - containerPort: 8080
+              name: spire-oidc-port
+          volumeMounts:
+            - name: spire-agent-socket
+              mountPath: /run/spire/agent-sockets
+              readOnly: true
+            - name: spire-oidc-config
+              mountPath: /run/spire/oidc/config/
+              readOnly: true
+      volumes:
+        - name: spire-agent-socket
+          hostPath:
+            path: /run/spire/agent-sockets
+            type: DirectoryOrCreate
+        - name: spire-oidc-config
+          configMap:
+            name: oidc-discovery-provider

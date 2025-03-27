@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-workload
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-workload
+  template:
+    metadata:
+      labels:
+        app: test-workload
+        spiffe.io/spire-managed-identity: "true"
+    spec:
+      serviceAccountName: test-workload
+      containers:
+        - name: main-app
+          image: curlimages/curl
+          command: ["sleep", "infinity"]

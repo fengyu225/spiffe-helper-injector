@@ -1,0 +1,16 @@
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: webhook-spiffeid
+spec:
+  spiffeIDTemplate: "spiffe://{{ .TrustDomain }}/workload/webhook"
+  podSelector:
+    matchLabels:
+      app: spiffe-helper-webhook
+      spiffe.io/spire-managed-identity: "true"
+  dnsNameTemplates:
+    - spiffe-helper-webhook
+    - spiffe-helper-webhook.spiffe-helper-webhook
+    - spiffe-helper-webhook.spiffe-helper-webhook.svc
+    - spiffe-helper-webhook.spiffe-helper-webhook.svc.cluster.local
+  ttl: 60m

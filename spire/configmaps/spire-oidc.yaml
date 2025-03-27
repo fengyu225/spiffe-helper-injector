@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oidc-discovery-provider
+  namespace: oidc-provider
+data:
+  oidc-discovery-provider.conf: |
+    log_level = "DEBUG"
+    domains = ["localhost", "oidc-provider", "oidc-provider.oidc-provider", "oidc-provider.oidc-provider.svc", "oidc-provider.oidc-provider.svc.cluster.local"]
+    allow_insecure_scheme = true
+    insecure_addr = ":8080"
+    workload_api {
+      socket_path = "/run/spire/agent-sockets/socket" 
+      trust_domain = "example.org"
+    }
+    health_checks {
+      bind_port = 8008
+      live_path = "/live"
+      ready_path = "/ready"
+    }
